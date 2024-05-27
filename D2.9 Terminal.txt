@@ -1,0 +1,195 @@
+>>> from newapp.models import *
+
+
+1. Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+
+u1 = User.objects.create_user('Marina')
+>>> u1
+<User: Marina>
+>>> u2 = User.objects.create_user('SkillFactory') 
+>>> u2
+<User: SkillFactory>
+
+
+2. Создать два объекта модели Author, связанные с пользователями.
+
+>>> Author.objects.create(authorUser=u1)
+<Author: Author object (1)>
+>>> Author.objects.create(authorUser=u2)
+<Author: Author object (2)>
+
+
+3. Добавить 4 категории в модель Category.
+
+>>> Category.objects.create(name='IT')
+<Category: Category object (1)>
+>>> Category.objects.create(name='Animals')
+<Category: Category object (2)>
+>>> Category.objects.create(name='Culture')
+<Category: Category object (3)>
+>>> Category.objects.create(name='Science')
+<Category: Category object (4)>
+
+
+4. Добавить 2 статьи и 1 новость.
+
+>>> author = Author.objects.get(id=1) 
+>>> author
+<Author: Author object (1)>
+>>> Post.objects.create(author=author, categoryType='AR', postTitle='Ученые хотят расшифровать язык кашалотов', postText='Эти массивные морские млекопит
+ающие общаются, издавая серию быстрых щелчков, которые звучат как сочетание “азбуки Морзе и хлопков попкорна”, — сообщает Лорен Соммер из NPR. Теперь, с
+ помощью искусственного интеллекта, ученые начинают разгадывать некоторые тайны, связанные с системой общения кашалотов.')
+<Post: Post object (1)>
+>>> Post.objects.create(author=author, categoryType='AR', postTitle='В Саудовской Аравии прошел первый показ купальников', postText='В минувшие выходные
+ в Саудовской Аравии состоялся первый в истории страны показ купальников в рамках Недели моды на Красном море (Red Sea Fashion Week). Неделя прошла на к
+урорте St. Regis Red Sea Resort, расположенном на острове у восточного побережья страны.')
+<Post: Post object (2)>
+>>> author = Author.objects.get(id=2) 
+>>> Post.objects.create(author=author, categoryType='NW', postTitle='Ученые смогли починить самый старый зонд Земли', postText='Впервые за пять месяцев 
+НАСА получило полезные данные с «Вояджера-1», самого удаленного от Земли космического аппарата. Самый старый зонд, который преодолел более 24 миллиардов
+ километров, 14 ноября перестал передавать научные и инженерные данные.')
+<Post: Post object (3)>
+
+>>> Post.objects.get(id=1).postTitle
+'Ученые хотят расшифровать язык кашалотов'
+>>> Post.objects.get(id=1).postText 
+'Эти массивные морские млекопитающие общаются, издавая серию быстрых щелчков, которые звучат как сочетание “азбуки Морзе и хлопков попкорна”, — сообщает
+ Лорен Соммер из NPR. Теперь, с помощью искусственного интеллекта, ученые начинают разгадывать некоторые тайны, связанные с системой общения кашалотов.'
+
+
+5. Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+
+>>> Post.objects.get(id=1).postCategory.add(Category.objects.get(id=1))
+>>> Post.objects.get(id=1).postCategory.add(Category.objects.get(id=2))
+>>> Post.objects.get(id=2).postCategory.add(Category.objects.get(id=3))
+>>> Post.objects.get(id=3).postCategory.add(Category.objects.get(id=4))
+>>> Post.objects.get(id=3).postCategory.add(Category.objects.get(id=1))
+>>> Post.objects.get(id=2).postCategory.add(Category.objects.get(id=4))
+
+
+6. Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=1), commentUser=User.objects.get(id=1),
+commentText='Кашалоты - молодцы!')
+<Comment: Comment object (1)>
+>>> Comment.objects.get(id=1).commentText                                                         
+'Кашалоты - молодцы!'
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=1), commentUser=User.objects.get(id=2), commentText='Ученые - молодцы!')
+<Comment: Comment object (2)>
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=2), commentUser=User.objects.get(id=1), commentText='Люблю Саудовскую Аравию')
+<Comment: Comment object (3)>
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=2), commentUser=User.objects.get(id=2), commentText='Люблю купальники')
+<Comment: Comment object (4)>
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=3), commentUser=User.objects.get(id=1), commentText='Супер!')
+<Comment: Comment object (5)>
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=3), commentUser=User.objects.get(id=2), commentText='Расшифруем Вояджер-1!')
+<Comment: Comment object (6)>
+
+
+7. Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+
+>>> Comment.objects.get(id=1).like()
+>>> Comment.objects.get(id=1).commentRating
+1
+>>> Author.objects.get(id=1).authorRating
+0
+>>> Author.objects.get(id=1).update_rating()
+>>> Author.objects.get(id=1).authorRating    
+1
+
+>>> Post.objects.get(id=1).like()           
+>>> Author.objects.get(id=1).update_rating()
+>>> Author.objects.get(id=1).authorRating    
+4
+
+>>> Comment.objects.get(id=1).like()        
+>>> Comment.objects.get(id=2).like() 
+>>> Comment.objects.get(id=2).like() 
+>>> Comment.objects.get(id=2).like()
+>>> Comment.objects.get(id=3).like() 
+>>> Post.objects.get(id=1).like()            
+>>> Post.objects.get(id=1).like()
+>>> Post.objects.get(id=1).like()
+>>> Post.objects.get(id=1).like()
+>>> Post.objects.get(id=2).like() 
+>>> Post.objects.get(id=2).like()
+>>> Post.objects.get(id=3).like()
+>>> Comment.objects.get(id=2).dislike() 
+
+
+
+8. Обновить рейтинги пользователей.
+
+>>> Author.objects.get(id=1).update_rating()
+>>> Author.objects.get(id=2).update_rating() 
+>>> Author.objects.get(id=1).authorRating    
+24
+>>> Author.objects.get(id=2).authorRating 
+5
+
+
+9. Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+
+>>> Author.objects.order_by('-authorRating')[:1]
+<QuerySet [<Author: Author object (1)>]>
+
+>>> a = Author.objects.order_by('-authorRating')[:1]
+>>> for i in a:
+...     i.authorUser.username
+...     i.authorRating       
+... 
+'Marina'
+24
+
+
+10. Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках
+ к этой статье.
+
+>>> Post.objects.order_by('-postRating')[:1]
+<QuerySet [<Post: Post object (3)>]>
+>>> best_article = Post.objects.order_by('-postRating')[:1]
+>>> for i in best_article:
+...     i.creationDate
+...     i.author.authorUser.username
+...     i.postRating
+...     i.postTitle
+...     i.preview()
+...
+datetime.datetime(2024, 5, 27, 18, 41, 57, 369534, tzinfo=datetime.timezone.utc)
+'Marina'
+5
+'Ученые хотят расшифровать язык кашалотов'
+'Эти массивные морские млекопитающие общаются, издавая серию быстрых щелчков, которые звучат как сочетание “азбуки Морзе и х...'
+>>>
+
+
+
+11. Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+
+>>> best_article         
+<QuerySet [<Post: Post object (1)>]>
+>>> best_article[0] 
+<Post: Post object (1)>
+
+>>> all_comments = Comment.objects.all()
+>>> for i in all_comments:
+...     if i.commentPost_id == best_article[0].id:
+...             i.creationDate
+...             i.commentUser.username
+...             i.commentRating
+...             i.commentText
+... 
+datetime.datetime(2024, 5, 27, 18, 57, 19, 602227, tzinfo=datetime.timezone.utc)
+'Marina'
+2
+'Кашалоты - молодцы!'
+datetime.datetime(2024, 5, 27, 18, 59, 28, 644196, tzinfo=datetime.timezone.utc)
+'SkillFactory'
+2
+'Ученые - молодцы!'
+>>>
